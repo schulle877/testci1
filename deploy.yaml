@@ -15,19 +15,6 @@ spec:
         app: fv8
     spec:
       initContainers:
-        - name: metrics
-          image: alpine:latest
-          command:
-            - /bin/sh
-            - -c
-          args:
-            - |
-              cat > /mnt/metrics << EOF
-              fv8_ready 1
-              EOF
-          volumeMounts:
-            - mountPath: /mnt
-              name: metrics
         - name: hostname
           image: alpine:latest
           command:
