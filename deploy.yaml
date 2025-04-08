@@ -14,7 +14,6 @@ spec:
       labels:
         app: fv8
     spec:
-      serviceAccount: workshop
       initContainers:
         - name: metrics
           image: alpine:latest
