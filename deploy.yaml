@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fv8
+  labels:
+    app: fv8
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: fv8
+  template:
+    metadata:
+      labels:
+        app: fv8
+    spec:
+      serviceAccount: workshop
+      initContainers:
+        - name: metrics
+          image: alpine:latest
+          command:
+            - /bin/sh
+            - -c
+          args:
+            - |
+              cat > /mnt/metrics << EOF
+              fv8_ready 1
+              EOF
+          volumeMounts:
+            - mountPath: /mnt
+              name: metrics
+        - name: hostname
+          image: alpine:latest
+          command:
+            - /bin/sh
+            - -c
+          args:
+            - hostname > /mnt/index.html
+          volumeMounts:
+            - mountPath: /mnt
+              name: metrics
+      containers:
+        - name: webserver
+          ports:
+            - name: web
+              containerPort: 80
+              protocol: TCP
+          image: httpd:latest
+          resources:
+            requests:
+              memory: 128Mi
+              cpu: 100m
+            limits:
+              memory: 256Mi
+              cpu: "1"
+          volumeMounts:
+            - mountPath: /usr/local/apache2/htdocs
+              name: metrics
+      volumes:
+        - name: metrics
+          emptyDir: {}
